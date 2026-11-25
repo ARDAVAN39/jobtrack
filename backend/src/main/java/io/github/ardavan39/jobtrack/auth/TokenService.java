@@ -2,6 +2,7 @@ package io.github.ardavan39.jobtrack.auth;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -33,7 +34,8 @@ public class TokenService {
     }
 
     public IssuedToken issue(User user) {
-        Instant now = clock.instant();
+        // JWT times are whole seconds; truncate so the expiry we report is exactly the token's
+        Instant now = clock.instant().truncatedTo(ChronoUnit.SECONDS);
         Instant expiresAt = now.plus(properties.ttl());
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(properties.issuer())
